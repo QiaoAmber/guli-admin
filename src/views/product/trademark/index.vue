@@ -47,7 +47,14 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref,onMounted } from 'vue'
+import {
+  getAllTrademarkListApi,
+  getTrademarkListApi,
+  addTrademarkApi,
+  deleteTrademarkApi,
+  updateTrademarkApi
+} from '@/api/product/trademark'
 const handleClick = () => {
   console.log('click')
 }
@@ -109,6 +116,10 @@ const handleSizeChange = (val: number) => {
 const handleCurrentChange = (val: number) => {
   console.log(`current page: ${val}`)
 }
+
+onMounted(() => {
+  getAllTrademarkListApi()
+})
 </script>
 <style lang="scss" scoped>
 .demo-pagination-block{

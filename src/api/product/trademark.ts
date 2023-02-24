@@ -23,7 +23,9 @@ export const getTrademarkListApi = (page: number, limit: number) => {
 export const addTrademarkApi = (tm: TrademarkModel) => {
   return request.post<any, null>(Api.AddTrademark, tm)
 }
-export const deleteTrademarkApi = (id:number) =>{
-    return request.delete<any,null>(Api.DeleteTrademark+`/${id}`)
+export const deleteTrademarkApi = (id: number) => {
+  return request.delete<any, null>(Api.DeleteTrademark + `/${id}`)
 }
-export const updateTrademarkApi = 
+export const updateTrademarkApi = (tm: TrademarkModel) => {
+  return request.put<any, null>(Api.UpdateTrademark, tm)
+}
