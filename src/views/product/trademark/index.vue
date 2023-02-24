@@ -5,15 +5,19 @@
         <el-button type="primary" :icon="Plus">添加</el-button>
       </div>
     </template>
-    <el-table :data="tableData" style="width: 100%" border>
+    <el-table :data="trademarkList" style="width: 100%" border>
       <el-table-column type="index" label="序号" width="150" align="center" />
-      <el-table-column prop="name" label="品牌名称" />
-      <el-table-column
-        prop="state"
-        label="品牌Logo"
-        width="150"
-        align="center"
-      />
+      <el-table-column prop="tmName" label="品牌名称" />
+      <el-table-column label="品牌Logo" width="150" align="center">
+        <template #default="{ row }">
+          <el-image
+            style="width: 100px; height: 100px"
+            :src="row.logoUrl"
+            fit="contain"
+            lazy
+          />
+        </template>
+      </el-table-column>
       <el-table-column fixed="right" label="操作" width="150" align="center">
         <template #default>
           <el-button type="primary" size="small" @click="handleClick"
@@ -37,6 +41,27 @@
         @current-change="handleCurrentChange"
       />
     </div>
+    <el-dialog v-model="dialogFormVisible" title="Shipping address">
+      <el-form :model="form">
+        <el-form-item label="Promotion name" :label-width="formLabelWidth">
+          <el-input v-model="form.name" autocomplete="off" />
+        </el-form-item>
+        <el-form-item label="Zones" :label-width="formLabelWidth">
+          <el-select v-model="form.region" placeholder="Please select a zone">
+            <el-option label="Zone No.1" value="shanghai" />
+            <el-option label="Zone No.2" value="beijing" />
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="dialogFormVisible = false">Cancel</el-button>
+          <el-button type="primary" @click="dialogFormVisible = false">
+            Confirm
+          </el-button>
+        </span>
+      </template>
+    </el-dialog>
   </el-card>
 </template>
 
@@ -47,7 +72,7 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { ref,onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import {
   getAllTrademarkListApi,
   getTrademarkListApi,
@@ -55,49 +80,10 @@ import {
   deleteTrademarkApi,
   updateTrademarkApi
 } from '@/api/product/trademark'
+import type { TrademarkListModel } from '@/api/product/model/trademarkModel'
 const handleClick = () => {
   console.log('click')
 }
-
-const tableData = [
-  {
-    date: '2016-05-03',
-    name: 'Tom',
-    state: 'California',
-    city: 'Los Angeles',
-    address: 'No. 189, Grove St, Los Angeles',
-    zip: 'CA 90036',
-    tag: 'Home'
-  },
-  {
-    date: '2016-05-02',
-    name: 'Tom',
-    state: 'California',
-    city: 'Los Angeles',
-    address: 'No. 189, Grove St, Los Angeles',
-    zip: 'CA 90036',
-    tag: 'Office'
-  },
-  {
-    date: '2016-05-04',
-    name: 'Tom',
-    state: 'California',
-    city: 'Los Angeles',
-    address: 'No. 189, Grove St, Los Angeles',
-    zip: 'CA 90036',
-    tag: 'Home'
-  },
-  {
-    date: '2016-05-01',
-    name: 'Tom',
-    state: 'California',
-    city: 'Los Angeles',
-    address: 'No. 189, Grove St, Los Angeles',
-    zip: 'CA 90036',
-    tag: 'Office'
-  }
-]
-
 
 const currentPage1 = ref(5)
 const currentPage2 = ref(5)
@@ -116,13 +102,30 @@ const handleSizeChange = (val: number) => {
 const handleCurrentChange = (val: number) => {
   console.log(`current page: ${val}`)
 }
+const trademarkList = ref<TrademarkListModel>([])
+const loading = ref<boolean>(false)
+const current = ref<number>(1)
+const pageSize = ref<number>(5)
+const total = ref<number>(0)
 
+const getTrademarkList = async (
+  page: number = current.value,
+  limit: number = pageSize.value
+) => {
+  loading.value = true
+  const result = await getTrademarkListApi(page, limit)
+  loading.value = false
+  trademarkList.value = result.records
+  total.value = result.total
+  current.value = page
+  pageSize.value = limit
+}
 onMounted(() => {
-  getAllTrademarkListApi()
+  getTrademarkList()
 })
 </script>
 <style lang="scss" scoped>
-.demo-pagination-block{
+.demo-pagination-block {
   margin-top: 20px;
 }
 </style>
