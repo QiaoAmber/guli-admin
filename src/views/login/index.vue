@@ -1,8 +1,13 @@
 <template>
   <div class="login-container">
-    <el-form ref="formRef" :model="loginForm" :rules="loginRules" 
-      class="login-form" auto-complete="on" label-position="left">
-
+    <el-form
+      ref="formRef"
+      :model="loginForm"
+      :rules="loginRules"
+      class="login-form"
+      auto-complete="on"
+      label-position="left"
+    >
       <div class="title-container">
         <h3 class="title">尚品汇后台管理</h3>
       </div>
@@ -38,26 +43,32 @@
           @keyup.enter.native="handleLogin"
         />
         <span class="show-pwd" @click="showPwd">
-          <svg-icon :name="passwordType === 'password' ? 'ele-Hide' : 'ele-View'" />
+          <svg-icon
+            :name="passwordType === 'password' ? 'ele-Hide' : 'ele-View'"
+          />
         </span>
       </el-form-item>
 
-      <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;height: 40px;" 
-        @click.native.prevent="handleLogin">登  陆</el-button>
-
+      <el-button
+        :loading="loading"
+        type="primary"
+        style="width: 100%; margin-bottom: 30px; height: 40px"
+        @click.native.prevent="handleLogin"
+        >登 陆</el-button
+      >
     </el-form>
   </div>
 </template>
 
 <script lang="ts">
 export default {
-  name: 'Login',
+  name: 'Login'
 }
 </script>
 
 <script lang="ts" setup>
-import { useUserInfoStore } from '@/stores/userInfo';
-import type { FormInstance } from 'element-plus';
+import { useUserInfoStore } from '@/stores/userInfo'
+import type { FormInstance } from 'element-plus'
 import { nextTick, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
@@ -75,7 +86,7 @@ const passwordRef = ref<HTMLInputElement>()
 const formRef = ref<FormInstance>()
 
 const validateUsername = (rule: any, value: any, callback: any) => {
-  if (value.length<4) {
+  if (value.length < 4) {
     callback(new Error('用户名长度不能小于4位'))
   } else {
     callback()
@@ -94,10 +105,13 @@ const loginRules = {
   password: [{ required: true, trigger: 'blur', validator: validatePassword }]
 }
 
-watch(route, () => {
-  redirect.value = route.query && route.query.redirect as string
-}, {immediate: true})
-
+watch(
+  route,
+  () => {
+    redirect.value = route.query && (route.query.redirect as string)
+  },
+  { immediate: true }
+)
 
 /* 
 切换密码的显示/隐藏
@@ -119,7 +133,7 @@ const showPwd = () => {
 const handleLogin = async () => {
   await formRef.value?.validate()
   loading.value = true
-  const {username, password} = loginForm.value
+  const { username, password } = loginForm.value
   try {
     await userInfoStore.login(username, password)
     router.push({ path: redirect.value || '/' })
@@ -133,8 +147,8 @@ const handleLogin = async () => {
 /* 修复input 背景不协调 和光标变色 */
 /* Detail see https://github.com/PanJiaChen/vue-element-admin/pull/927 */
 
-$bg:#283443;
-$light_gray:#fff;
+$bg: #283443;
+$light_gray: #fff;
 $cursor: #fff;
 
 @supports (-webkit-mask: none) and (not (cater-color: $cursor)) {
@@ -171,7 +185,6 @@ $cursor: #fff;
         }
       }
     }
-    
   }
 
   .el-form-item {
@@ -184,9 +197,9 @@ $cursor: #fff;
 </style>
 
 <style lang="scss" scoped>
-$bg:#2d3a4b;
-$dark_gray:#889aa4;
-$light_gray:#eee;
+$bg: #2d3a4b;
+$dark_gray: #889aa4;
+$light_gray: #eee;
 
 .login-container {
   min-height: 100%;
