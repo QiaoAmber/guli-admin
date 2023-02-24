@@ -29,16 +29,16 @@
     </el-table>
     <div class="demo-pagination-block">
       <el-pagination
-        v-model:current-page="currentPage4"
-        v-model:page-size="pageSize4"
+        v-model:current-page="current"
+        v-model:page-size="pageSize"
         :page-sizes="[3, 6, 9]"
         :small="small"
         :disabled="disabled"
         :background="background"
         layout="prev, pager, next,->,sizes,total"
-        :total="400"
-        @size-change="handleSizeChange"
-        @current-change="handleCurrentChange"
+        :total="total"
+        @size-change="(val:number)=>getTrademarkList(1,val)"
+        @current-change="(val:number)=>getTrademarkList(val,pageSize)"
       />
     </div>
     <el-dialog v-model="dialogFormVisible" title="Shipping address">
@@ -85,27 +85,22 @@ const handleClick = () => {
   console.log('click')
 }
 
-const currentPage1 = ref(5)
-const currentPage2 = ref(5)
-const currentPage3 = ref(5)
-const currentPage4 = ref(4)
-const pageSize2 = ref(100)
-const pageSize3 = ref(100)
-const pageSize4 = ref(100)
+
 const small = ref(false)
 const background = ref(false)
 const disabled = ref(false)
 
 const handleSizeChange = (val: number) => {
-  console.log(`${val} items per page`)
+  getTrademarkList(1,val)
 }
 const handleCurrentChange = (val: number) => {
+  getTrademarkList(val,)
   console.log(`current page: ${val}`)
 }
 const trademarkList = ref<TrademarkListModel>([])
 const loading = ref<boolean>(false)
 const current = ref<number>(1)
-const pageSize = ref<number>(5)
+const pageSize = ref<number>(3)
 const total = ref<number>(0)
 
 const getTrademarkList = async (
@@ -123,6 +118,9 @@ const getTrademarkList = async (
 onMounted(() => {
   getTrademarkList()
 })
+const dialogTableVisible = ref(false)
+const dialogFormVisible = ref(false)
+const formLabelWidth = '140px'
 </script>
 <style lang="scss" scoped>
 .demo-pagination-block {
