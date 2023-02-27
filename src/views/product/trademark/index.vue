@@ -19,11 +19,13 @@
         </template>
       </el-table-column>
       <el-table-column fixed="right" label="操作" width="150" align="center">
-        <template #default>
-          <el-button type="primary" size="small" @click="handleClick"
+        <template #default="{ row }">
+          <el-button type="primary" size="small" @click="handleClick(row)"
             >修改</el-button
           >
-          <el-button type="danger" size="small">删除</el-button>
+          <el-button type="danger" size="small" @click="deleteClick(row)"
+            >删除</el-button
+          >
         </template>
       </el-table-column>
     </el-table>
@@ -60,7 +62,11 @@
             <el-icon v-if="uploadLoading" class="avatar-uploader-icon">
               <Loading />
             </el-icon>
-            <img v-if="trademarkForm.logoUrl" :src="trademarkForm.logoUrl" class="avatar" />
+            <img
+              v-if="trademarkForm.logoUrl"
+              :src="trademarkForm.logoUrl"
+              class="avatar"
+            />
             <el-icon v-else class="avatar-uploader-icon"><Plus /></el-icon>
           </el-upload>
         </el-form-item>
@@ -85,11 +91,15 @@ export default {
 
 <script setup lang="ts">
 import { ref, onMounted, reactive } from 'vue'
-import type { FormInstance, FormRules, UploadProps } from 'element-plus'
+import {
+  ElMessageBox,
+  type FormInstance,
+  type FormRules,
+  type UploadProps
+} from 'element-plus'
 import { ElMessage } from 'element-plus'
 import { Plus } from '@element-plus/icons-vue'
 import {
-  getAllTrademarkListApi,
   getTrademarkListApi,
   addTrademarkApi,
   deleteTrademarkApi,
@@ -99,9 +109,6 @@ import type {
   TrademarkListModel,
   TrademarkModel
 } from '@/api/product/model/trademarkModel'
-const handleClick = () => {
-  console.log('click')
-}
 
 const small = ref(false)
 const background = ref(false)
@@ -141,6 +148,35 @@ const showDialog = () => {
   dialogFormVisible.value = true
   Object.assign(trademarkForm, getTmInitData())
 }
+//修改商品品牌操作！
+const handleClick = (row: TrademarkModel) => {
+  dialogFormVisible.value = true
+  Object.assign(trademarkForm, row)
+}
+//删除商品品牌
+const deleteClick = (row: TrademarkModel) => {
+  ElMessageBox.confirm(`你确认要删除${row.tmName}吗？`, '警告提示', {
+    confirmButtonText: '确认',
+    cancelButtonText: '取消',
+    type: 'warning'
+  })
+    .then(async () => {
+      await deleteTrademarkApi(row.id as number)
+      ElMessage({
+        type: 'success',
+        message: '删除成功'
+      })
+      if (trademarkList.value.length === 1 && current.value > 1)
+        getTrademarkList(1, pageSize.value)
+      else getTrademarkList(current.value, pageSize.value)
+    })
+    .catch(() => {
+      ElMessage({
+        type: 'info',
+        message: '取消删除'
+      })
+    })
+}
 
 //表单校验规则
 const tmNameValidator = (rule: any, value: any, callback: any) => {
@@ -171,11 +207,17 @@ const handleAvatarSuccess: UploadProps['onSuccess'] = (
 ) => {
   trademarkForm.logoUrl = response.data
   uploadLoading.value = false
+  ruleFormRef.value?.validateField('logoUrl')
 }
 
 const beforeAvatarUpload: UploadProps['beforeUpload'] = (rawFile) => {
-  const JPGOrPNG = ['image/jpeg', 'image/png','image/jpg','image/JPG'].indexOf(rawFile.type)
-  const isLt200K = rawFile.size/1024 <200
+  const JPGOrPNG = [
+    'image/jpeg',
+    'image/png',
+    'image/jpg',
+    'image/JPG'
+  ].indexOf(rawFile.type)
+  const isLt200K = rawFile.size / 1024 < 200
   if (JPGOrPNG < 0) {
     ElMessage.error('请使用jpeg,png,jpg格式的图片!')
     return false
