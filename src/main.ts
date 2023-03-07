@@ -8,12 +8,12 @@ import router from './router'
 import './styles/index.scss'
 import ElSvg from './components/SvgIcon/ElSvg'
 import './permission'
+import CategorySelector from '@/components/CategorySelector/index.vue'
 
 const app = createApp(App)
-
+app.component(CategorySelector.name, CategorySelector)
 
 ElSvg(app)
-
 app.use(pinia)
   .use(router)
   .use(ElementPlus, {
